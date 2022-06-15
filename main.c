@@ -32,7 +32,7 @@ int main(int argc, char **argv) {
         return -err;
     }
 
-    unsigned int activated = 0;
+    unsigned int activated = 0, history = 0;
     while (true) {
         unsigned char buf[7]; // 7-axis "joystick"
         int r = read(hid, buf, sizeof(buf));
@@ -45,6 +45,10 @@ int main(int argc, char **argv) {
         const struct sandio_state state = sandio_decode(buf);
 
         unsigned int packed = state.top | (state.right << 8) | (state.left << 16);
+        if (packed == history) {
+            continue;
+        }
+        history = packed;
         bool sync = false;
         for (int i = 0;; ++i) {
             const struct rule r = rules[i];
