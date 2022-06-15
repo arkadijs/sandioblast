@@ -1,10 +1,10 @@
 #include <errno.h>
 #include <fcntl.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
 
-#include <libevdev/libevdev.h>
 #include <libevdev/libevdev-uinput.h>
 
 #include "decl.h"
@@ -32,8 +32,8 @@ int main(int argc, char **argv) {
         return -err;
     }
 
-    int activated = 0;
-    while (1) {
+    unsigned int activated = 0;
+    while (true) {
         unsigned char buf[7]; // 7-axis "joystick"
         int r = read(hid, buf, sizeof(buf));
         if (r != sizeof(buf)) {
@@ -44,8 +44,8 @@ int main(int argc, char **argv) {
         }
         const struct sandio_state state = sandio_decode(buf);
 
-        int packed = state.top | (state.right << 8) | (state.left << 16);
-        int fired = 0;
+        unsigned int packed = state.top | (state.right << 8) | (state.left << 16);
+        bool sync = false;
         for (int i = 0;; ++i) {
             const struct rule r = rules[i];
             if (!r.mask) {
@@ -54,20 +54,18 @@ int main(int argc, char **argv) {
             if (packed & r.mask & ~activated) {
                 libevdev_uinput_write_event(uidev, EV_KEY, r.code, 1);
                 activated |= r.mask;
-                fired = 1;
+                sync = true;
             }
             if (~packed & r.mask & activated) {
                 libevdev_uinput_write_event(uidev, EV_KEY, r.code, 0);
                 activated &= ~r.mask;
-                fired = 1;
+                sync = true;
             }
         }
-        if (fired) {
+        if (sync) {
             libevdev_uinput_write_event(uidev, EV_SYN, SYN_REPORT, 0);
         }
     }
 
     libevdev_uinput_destroy(uidev);
-
-    return 0;
 }

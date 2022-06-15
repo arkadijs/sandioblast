@@ -12,6 +12,6 @@ struct rule {
     unsigned int code;
 };
 
-const struct rule *rules;
+extern const struct rule *rules;
 
 int uinput_init(struct libevdev_uinput **uinput_dev);
