@@ -1,2 +1,4 @@
 /sandioblast
 *.o
+CMakeLists.txt.user
+/build/
