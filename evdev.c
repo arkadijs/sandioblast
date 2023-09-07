@@ -6,7 +6,7 @@
 #include "decl.h"
 
 
-const char* uinput_device_name = "Sandio keyboard emulation";
+static const char* uinput_device_name = "Sandio keyboard emulation";
 
 /* init uinput keyboard device and enable common key codes */
 int uinput_init(struct libevdev_uinput **uinput_dev) {
@@ -22,7 +22,7 @@ int uinput_init(struct libevdev_uinput **uinput_dev) {
     libevdev_set_name(dev, uinput_device_name);
 
     libevdev_enable_event_type(dev, EV_KEY);
-    for (int key = KEY_ESC; key < KEY_MIN_INTERESTING; ++key) {
+    for (unsigned int key = KEY_ESC; key < KEY_MIN_INTERESTING; ++key) {
         libevdev_enable_event_code(dev, EV_KEY, key, 0);
     }
 

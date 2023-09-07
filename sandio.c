@@ -4,7 +4,7 @@
 
 
 struct __attribute__ ((__packed__)) sandio_encoded_state {
-    uint8_t constant;
+    uint8_t _report;
     uint8_t dpi;
     uint8_t top;
     uint8_t right;
