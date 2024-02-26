@@ -20,6 +20,38 @@ To find out which `hidraw` device search kernel messages.
 
 Configure in `config.h` and recompile. Key codes could be found in `/usr/include/linux/input-event-codes.h`.
 
-Thanks to the author of https://github.com/EssentialNPC/SandioKeyMapper for an inspiration.
+### systemd setup
+
+Create `/etc/udev/rules.d/99-sandio.rules`:
+
+    ACTION=="add", SUBSYSTEM=="hidraw", ENV{DEVPATH}=="*.1/0003:19CA:0001.*", SYMLINK+="sandiotech_joysticks", ENV{SYSTEMD_WANTS}+="sandioblast.service", TAG+="systemd"
+
+Create `/etc/systemd/system/sandioblast.service`:
+
+    [Unit]
+    Description=SandioTech 3D Game O2 mouse joysticks mapper to keyboard keys
+    BindsTo=dev-sandiotech_joysticks.device
+    After=dev-sandiotech_joysticks.device
+
+    [Service]
+    ExecStart=-/usr/local/bin/sandioblast /dev/sandiotech_joysticks
+
+    [Install]
+    WantedBy=multi-user.target
+
+Reconfigure, as root:
+
+    systemctl daemon-reload
+    systemctl enable sandioblast
+    udevadm control --reload
+
+Unplug and plug the mouse back. Check:
+
+    systemctl status sandioblast
+
+Enjoy!
+
+
+Thanks to the author of [SandioKeyMapper](https://github.com/EssentialNPC/SandioKeyMapper) for an inspiration.
 
 MIT license.
