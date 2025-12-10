@@ -26,18 +26,7 @@ Create `/etc/udev/rules.d/99-sandio.rules`:
 
     ACTION=="add", SUBSYSTEM=="hidraw", ENV{DEVPATH}=="*.1/0003:19CA:0001.*", SYMLINK+="sandiotech_joysticks", ENV{SYSTEMD_WANTS}+="sandioblast.service", TAG+="systemd"
 
-Create `/etc/systemd/system/sandioblast.service`:
-
-    [Unit]
-    Description=SandioTech 3D Game O2 mouse joysticks mapper to keyboard keys
-    BindsTo=dev-sandiotech_joysticks.device
-    After=dev-sandiotech_joysticks.device
-
-    [Service]
-    ExecStart=-/usr/local/bin/sandioblast /dev/sandiotech_joysticks
-
-    [Install]
-    WantedBy=multi-user.target
+move systemd file named `sandioblast.service` to the  `/etc/systemd/system/`
 
 Reconfigure, as root:
 

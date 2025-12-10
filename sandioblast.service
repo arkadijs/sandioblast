@@ -1,0 +1,10 @@
+    [Unit]
+    Description=SandioTech 3D Game O2 mouse joysticks mapper to keyboard keys
+    BindsTo=dev-sandiotech_joysticks.device
+    After=dev-sandiotech_joysticks.device
+
+    [Service]
+    ExecStart=-/usr/local/bin/sandioblast /dev/sandiotech_joysticks
+
+    [Install]
+    WantedBy=multi-user.target
