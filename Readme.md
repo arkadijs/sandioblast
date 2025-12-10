@@ -26,7 +26,7 @@ Create `/etc/udev/rules.d/99-sandio.rules`:
 
     ACTION=="add", SUBSYSTEM=="hidraw", ENV{DEVPATH}=="*.1/0003:19CA:0001.*", SYMLINK+="sandiotech_joysticks", ENV{SYSTEMD_WANTS}+="sandioblast.service", TAG+="systemd"
 
-move systemd file named `sandioblast.service` to the  `/etc/systemd/system/`
+Move systemd file named `sandioblast.service` to the  `/etc/systemd/system/`
 
 Reconfigure, as root:
 
