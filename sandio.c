@@ -13,7 +13,7 @@ struct __attribute__ ((__packed__)) sandio_encoded_state {
     uint8_t magic_lo;
 };
 
-unsigned char sandio_decode_button(uint8_t encoded, uint8_t off) {
+static unsigned char sandio_decode_button(uint8_t encoded, uint8_t off) {
     uint8_t val = encoded - off;
     return (unsigned char)(val & 0xF0 ? 0 : val);
 }
@@ -23,7 +23,7 @@ unsigned char sandio_decode_button(uint8_t encoded, uint8_t off) {
  */
 struct sandio_state sandio_decode(const void *_encoded) {
     const struct sandio_encoded_state *encoded = _encoded;
-    
+
     uint16_t magic = ((uint16_t)encoded->magic_hi) << 8 | encoded->magic_lo;
     uint8_t off = 240 * ((21 * (uint32_t)magic + 7) % 2048) / 2048;
 

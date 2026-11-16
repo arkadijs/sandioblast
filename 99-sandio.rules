@@ -1,0 +1,1 @@
+ACTION=="add", SUBSYSTEM=="hidraw", ENV{DEVPATH}=="*.1/0003:19CA:0001.*", SYMLINK+="sandiotech_joysticks", ENV{SYSTEMD_WANTS}+="sandioblast@sandiotech_joysticks.service", TAG+="systemd"

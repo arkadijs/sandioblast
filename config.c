@@ -16,7 +16,7 @@
 #define LB (0x04 << 16)
 #define LU (0x08 << 16)
 
-const struct rule *rules = (struct rule[]){
+const struct rule_t rules[] = {
     {TF, KEY_W},
     {TB, KEY_S},
     {TL, KEY_A},

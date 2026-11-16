@@ -1,4 +1,5 @@
 #include <errno.h>
+#include <stddef.h>
 
 #include <libevdev/libevdev.h>
 #include <libevdev/libevdev-uinput.h>
@@ -6,13 +7,17 @@
 #include "decl.h"
 
 
-static const char* uinput_device_name = "Sandio keyboard emulation";
+static const char *uinput_device_name = "Sandio keyboard emulation";
 
-/* init uinput keyboard device and enable common key codes */
+/* init uinput keyboard device and enable key codes of the rules */
 int uinput_init(struct libevdev_uinput **uinput_dev) {
     int err;
     struct libevdev *dev;
     struct libevdev_uinput *uidev;
+
+    if (!uinput_dev) {
+        return -EINVAL;
+    }
 
     dev = libevdev_new();
     if (!dev) {
@@ -20,10 +25,14 @@ int uinput_init(struct libevdev_uinput **uinput_dev) {
     }
 
     libevdev_set_name(dev, uinput_device_name);
+    libevdev_set_id_bustype(dev, BUS_USB);
+    libevdev_set_id_vendor(dev, 0x19ca);
+    libevdev_set_id_product(dev, 0x0001);
 
     libevdev_enable_event_type(dev, EV_KEY);
-    for (unsigned int key = KEY_ESC; key < KEY_MIN_INTERESTING; ++key) {
-        libevdev_enable_event_code(dev, EV_KEY, key, 0);
+
+    for (const struct rule_t *rule = rules; rule->mask != 0; ++rule) {
+        libevdev_enable_event_code(dev, EV_KEY, rule->code, NULL);
     }
 
     err = libevdev_uinput_create_from_device(dev, LIBEVDEV_UINPUT_OPEN_MANAGED, &uidev);
@@ -32,7 +41,7 @@ int uinput_init(struct libevdev_uinput **uinput_dev) {
         return err;
     }
 
-    *uinput_dev = uidev; 
+    *uinput_dev = uidev;
 
     return 0;
 }

@@ -18,23 +18,26 @@ To find out which `hidraw` device search kernel messages.
 
 > hid-generic 0003:19CA:0001.0009: input,hidraw1: USB HID v1.10 Multi-Axis Controller [Mindtribe Sandio 3D HID Mouse] on usb-0000:01:00.0-1.1/input1
 
-Configure in `config.h` and recompile. Key codes could be found in `/usr/include/linux/input-event-codes.h`.
+Configure in `config.c` and recompile. Key codes could be found in `/usr/include/linux/input-event-codes.h`.
 
 ### systemd setup
 
+Install service and udev rules (or run `sudo make install install-systemd`):
+
 Create `/etc/udev/rules.d/99-sandio.rules`:
 
-    ACTION=="add", SUBSYSTEM=="hidraw", ENV{DEVPATH}=="*.1/0003:19CA:0001.*", SYMLINK+="sandiotech_joysticks", ENV{SYSTEMD_WANTS}+="sandioblast.service", TAG+="systemd"
+    ACTION=="add", SUBSYSTEM=="hidraw", ENV{DEVPATH}=="*.1/0003:19CA:0001.*", SYMLINK+="sandiotech_joysticks", ENV{SYSTEMD_WANTS}+="sandioblast@sandiotech_joysticks.service", TAG+="systemd"
 
-Create `/etc/systemd/system/sandioblast.service`:
+Create `/etc/systemd/system/sandioblast@.service` (or copy from repository):
 
     [Unit]
     Description=SandioTech 3D Game O2 mouse joysticks mapper to keyboard keys
+    StopWhenUnneeded=true
     BindsTo=dev-sandiotech_joysticks.device
     After=dev-sandiotech_joysticks.device
 
     [Service]
-    ExecStart=-/usr/local/bin/sandioblast /dev/sandiotech_joysticks
+    ExecStart=-/usr/local/bin/sandioblast /dev/%I
 
     [Install]
     WantedBy=multi-user.target
@@ -42,12 +45,12 @@ Create `/etc/systemd/system/sandioblast.service`:
 Reconfigure, as root:
 
     systemctl daemon-reload
-    systemctl enable sandioblast
+    systemctl enable sandioblast@sandiotech_joysticks
     udevadm control --reload
 
 Unplug and plug the mouse back. Check:
 
-    systemctl status sandioblast
+    systemctl status sandioblast@sandiotech_joysticks
 
 Enjoy!
 
